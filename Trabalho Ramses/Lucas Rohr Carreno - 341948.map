@@ -1,0 +1,22 @@
+Símbolo         Valor Decimal   Valor Hexadecimal
+-------         -------------   -----------------
+TOTAL_SFILE               128                  80
+INDEX_SFILE               129                  81
+INDEX_SLOOK               130                  82
+AUXILIAR_SLOOK            131                  83
+AUXILIAR_SRES             132                  84
+SFILE                     224                  E0
+SLOOK                     225                  E1
+SRES                      226                  E2
+ENTRADA                   227                  E3
+BUSCA                     234                  EA
+CONSTANTE_ZERO              0                   0
+COMPARA                    29                  1D
+CONTA_CARACTERE_IGUAL       67                  43
+SALVA_AUXILIAR_SRES        73                  49
+CONTINUA_CONTA_CARACTERE_IGUAL       77                  4D
+FIM_BUSCA                  91                  5B
+FIM_SFILE_VAZIO            96                  60
+FIM_SLOOK_VAZIO            97                  61
+LOOP_SLOOK_VAZIO           97                  61
+FIM_LOOP_SLOOK_VAZIO      113                  71

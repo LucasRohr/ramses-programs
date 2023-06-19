@@ -1,0 +1,176 @@
+ORG 128
+
+total_SFILE: DB 0 ; Contador do total de caracteres de SFILE, para caso onde SLOOK seja vazio
+index_SFILE: DB 0 ; Indice para ler caractere de SFILE
+index_SLOOK: DB 0 ; Indice para ler caractere de SLOOK
+
+auxiliar_SLOOK: DB 0 ; Variavel auxiliar para guardar o caractere atual lido de SLOOK a cada volta do loop
+auxiliar_SRES: DB 0  ; Variavel auxiliar para guardar o indice onde possa ser encontrada a substring SLOOK
+
+
+
+ORG 224 ; (0xE0) teste, apagar depois
+
+SFILE: DB 227 ; (Endereco 0xE0)
+SLOOK: DB 233 ; (Endereco 0xE1)
+SRES: DB 0    ; (Endereco 0xE2)
+
+entrada: DAB 1, 2, 3, 61, 62, 63, 0
+busca: DAB 61, 62, 63, 0
+
+
+
+
+
+ORG 0
+
+constante_zero: DB 0
+
+
+; Inicializa registradores
+
+LDR A, #0
+LDR B, #0
+LDR X, #0
+
+; Inicializa contadores e auxiliares
+
+STR A, total_SFILE
+STR A, index_SFILE
+STR A, index_SLOOK
+STR A, auxiliar_SLOOK
+STR A, auxiliar_SRES
+
+; inicializa resultado com 0
+STR A, SRES
+
+; inicializa constante zero
+STR A, constante_zero
+
+
+; Carrega o primeiro caractere de cada string para verificar casos onde sao vazios
+
+LDR A, SFILE, I
+JZ fim_SFILE_vazio
+
+LDR B, SLOOK, I
+JZ fim_SLOOK_vazio
+
+
+compara:
+
+	; Loop para comparar o caractere SFILE[index_SFILE] com o caractere SLOOK[index_SLOOK]
+
+
+	; Carrega o endereco de SFILE no registrador X e soma o indice do caractere atual de SFILE ao endereco carregado
+	LDR X,SFILE
+	ADD X, index_SFILE
+	LDR A, constante_zero, X ; Carrega o endereco do caractere atual de SFILE no registrador A usando o registrador X no modo indexado
+
+	; Se o caractere atual de SFILE, lido no registrador A, for 0x00, finaliza a busca
+	JZ fim_busca
+
+	; Carrega o endereco de SLOOK no registrador X e soma o indice do caractere atual de SLOOK ao endereco carregado
+	LDR X,SLOOK
+	LDR B, #0
+	ADD X, index_SLOOK
+	LDR B, constante_zero, X ; Carrega o endereco do caractere atual de SLOOK no registrador B usando o registrador X no modo indexado
+
+	; Se o caractere atual de SLOOK, lido no registrador B, for 0x00, finaliza a busca
+	JZ fim_busca
+
+	STR B, auxiliar_SLOOK ; Guarda o caractere atual da string de busca que esta no registrador B na auxiliar de SLOOK
+
+	SUB A, auxiliar_SLOOK ; Subtrai o valor do caractere atual de SLOOK, que esta na auxiliar, do valor do caractere atual de SFILE no registrador A
+
+	; Se nao ha diferenca na subtracao, os caracteres sao iguais, entao contabiliza isso
+	JZ conta_caractere_igual
+
+	; Se caractere for diferente, zera o auxiliar do resultado SRES e zera o indice de busca da SLOOK
+	LDR B, #0
+	STR B, auxiliar_SRES
+	STR B, index_SLOOK
+
+
+	; Incrementa indice de busca da string SFILE
+
+	LDR A, index_SFILE
+	ADD A, #1
+	STR A, index_SFILE
+
+	JMP compara ; Volta para o comeco do loop para comparar os proximos caracteres
+	
+	
+	conta_caractere_igual:
+
+		; Carrega o SRES auxiliar, se ele for zero, entao ainda nao foi salvo um indice de resultado nele, entao pode salvar o novo encontrado
+		LDR A, auxiliar_SRES
+		JZ salva_auxiliar_SRES
+
+		; Caso o SRES auxiliar nao for zero, entao apenas pula o STR do indice atual onde os caracteres sao iguais
+		JMP continua_conta_caractere_igual
+	
+		salva_auxiliar_SRES:
+
+			; Salva o primeiro caractere igual encontrado
+			LDR B, index_SLOOK
+			STR B, auxiliar_SRES
+
+		continua_conta_caractere_igual:
+
+			; Incrementa indices de busca das strings
+
+			LDR A, index_SFILE
+			ADD A, #1
+			STR A, index_SFILE
+
+
+			LDR B, index_SLOOK
+			ADD B, #1
+			STR B, index_SLOOK
+
+			JMP compara ; Volta para o loop de comparacao dos caracteres
+
+
+fim_busca:
+	
+	; Para finalizar apos percorrer um ou ambas as strings, apenas carrega o resultado da variavel auxiliar em SRES e para o programa
+	LDR A, auxiliar_SRES
+	STR A, SRES
+	HLT
+
+
+fim_SFILE_vazio:
+	
+	; Como o SRES é inicializado com 0, apenas para o programa quando a string de entrada SFILE for vazia
+	HLT
+
+fim_SLOOK_vazio:
+	
+	; Caso a string de busca SLOOK seja vazia, conta quantos caracteres tem SFILE para ter como resultado, segundo regra do enunciado
+
+	loop_SLOOK_vazio:
+
+		; Incrementa 1 no total de caracteres de SFILE
+		LDR A, total_SFILE
+		ADD A, #1
+		STR A, total_SFILE
+		
+		; Carrega o total de SFILE no registrador X e carrega o caractere relacionado ao indice da variável no registrador A
+		LDR X, SFILE
+		ADD X total_SFILE
+		LDR A, constante_zero, X
+
+		; Se o caractere lido no registrador A for 0x00, pula para o final
+		JZ fim_loop_SLOOK_vazio
+		
+		 ; Se nao, volta no loop
+		JMP loop_SLOOK_vazio
+
+	fim_loop_SLOOK_vazio:
+
+		; Carrega o total de caracteres de SFILE como resultado final em SRES
+
+		LDR A, total_SFILE
+		STR A, SRES
+		HLT
