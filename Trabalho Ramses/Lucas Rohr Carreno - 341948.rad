@@ -15,7 +15,7 @@ SFILE: DB 227 ; (Endereco 0xE0)
 SLOOK: DB 233 ; (Endereco 0xE1)
 SRES: DB 0    ; (Endereco 0xE2)
 
-entrada: DAB 1, 2, 3, 61, 62, 63, 0
+entrada: DAB 1, 2, 61, 62, 61, 62, 63, 0
 busca: DAB 61, 62, 63, 0
 
 
@@ -72,7 +72,6 @@ compara:
 
 	; Carrega o endereco de SLOOK no registrador X e soma o indice do caractere atual de SLOOK ao endereco carregado
 	LDR X,SLOOK
-	LDR B, #0
 	ADD X, index_SLOOK
 	LDR B, constante_zero, X ; Carrega o endereco do caractere atual de SLOOK no registrador B usando o registrador X no modo indexado
 
@@ -113,7 +112,7 @@ compara:
 		salva_auxiliar_SRES:
 
 			; Salva o primeiro caractere igual encontrado
-			LDR B, index_SLOOK
+			LDR B, index_SFILE
 			STR B, auxiliar_SRES
 
 		continua_conta_caractere_igual:
